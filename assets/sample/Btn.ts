@@ -16,16 +16,18 @@ export default class Btn extends cc.Component {
         click: "click"
     }
 
-    @property(newState({BtnState}))
+    @property(newState("BtnState", BtnState))
     btnState:State<BtnState> = null
 
     @property
     get interactable(){
-        return this.btnState.state != BtnState.disable
+        return this.btnState && this.btnState.state != BtnState.disable
     }
 
     set interactable(val:boolean){
-        this.btnState.state = !!val? BtnState.nor: BtnState.disable
+        if (this.btnState) {
+            this.btnState.state = !!val? BtnState.nor: BtnState.disable
+        }
     }
 
     onLoad(){
@@ -36,14 +38,14 @@ export default class Btn extends cc.Component {
             this.btnState.state = BtnState.down
         }, this)
         this.node.on(cc.Node.EventType.TOUCH_END, ()=>{
-            if (this.btnState.state == 2) {
+            if (this.btnState.state != BtnState.down) {
                 return false
             }
             this.node.emit(Btn.EventType.click)
             this.btnState.state = BtnState.nor
         }, this)
         this.node.on(cc.Node.EventType.TOUCH_CANCEL, ()=>{
-            if (this.btnState.state == 2) {
+            if (this.btnState.state == BtnState.disable) {
                 return false
             }
             this.btnState.state = BtnState.down

@@ -4,14 +4,12 @@ export declare class State<T> extends cc.EventTarget{
     state:T;
     _stateEnum:(new ()=> T);
     stateNames: string[];
-    setState(state:T): T;
-    isState(state:T): boolean;
-    subStaters:Stater[]
+    public setState(state:T): T;
+    public isState(state:T): boolean;
+    public subStaters:Stater[]
 }
 
-export function newState(enumDef) {
-    let name = Object.getOwnPropertyNames(enumDef)[0]
-    let enumType = enumDef[name]
+export function newState(name, enumType) {
     let classDef = {
         name:name,
         extends: cc.EventTarget,
@@ -22,10 +20,10 @@ export function newState(enumDef) {
                 type: cc.Integer,
                 notify(oldVal){
                     this._state = oldVal
-                    cc.log("state", this.state, oldVal)
                     if (this.state === oldVal) {
                         return
                     }
+                    cc.log(name, oldVal, this.state)
                     this.emit("state", this.state, oldVal)
                     this.emit(this._stateEnum[this.state])
                     this._flushSubStaters()
@@ -68,7 +66,6 @@ export function newState(enumDef) {
             }
         },
         _flushSubStaters(){
-            let num = this.subStaters.length
             let staters = []
             let nodes = {}
             for (const stater of this.subStaters) {
@@ -78,7 +75,7 @@ export function newState(enumDef) {
                     }
                     nodes[stater.node.uuid] = stater.node
                     for (const s of stater.getComponents(Stater)) {
-                        if (!s.bindState) {
+                        if (!s.bindState && CC_EDITOR) {
                             s.bindState = name
                         }
                         if (s.bindState == name) {
@@ -87,6 +84,9 @@ export function newState(enumDef) {
                         }
                     }
                 }
+            }
+            if (!CC_EDITOR) {
+                return
             }
             if (!this.subStaters.every((s,i)=>s && staters[i] && s.uuid == staters[i].uuid)) {
                 this.subStaters = staters
