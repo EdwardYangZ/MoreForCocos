@@ -1,0 +1,53 @@
+
+import {State, newState } from "../base/State";
+
+const {ccclass, property, inspector} = cc._decorator;
+
+export enum BtnState {
+    nor,
+    down,
+    disable,
+}
+
+@ccclass
+export default class Btn extends cc.Component {
+
+    static EventType = {
+        click: "click"
+    }
+
+    @property(newState({BtnState}))
+    btnState:State<BtnState> = null
+
+    @property
+    get interactable(){
+        return this.btnState.state != BtnState.disable
+    }
+
+    set interactable(val:boolean){
+        this.btnState.state = !!val? BtnState.nor: BtnState.disable
+    }
+
+    onLoad(){
+        this.node.on(cc.Node.EventType.TOUCH_START, ()=>{
+            if (this.btnState.state == BtnState.disable) {
+                return false
+            }
+            this.btnState.state = BtnState.down
+        }, this)
+        this.node.on(cc.Node.EventType.TOUCH_END, ()=>{
+            if (this.btnState.state == 2) {
+                return false
+            }
+            this.node.emit(Btn.EventType.click)
+            this.btnState.state = BtnState.nor
+        }, this)
+        this.node.on(cc.Node.EventType.TOUCH_CANCEL, ()=>{
+            if (this.btnState.state == 2) {
+                return false
+            }
+            this.btnState.state = BtnState.down
+        }, this)
+    }
+}
+
