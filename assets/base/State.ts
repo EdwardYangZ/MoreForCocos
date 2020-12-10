@@ -23,15 +23,10 @@ export function newState(name, enumType) {
                     if (this.state === oldVal) {
                         return
                     }
-                    cc.log(name, oldVal, this.state)
+                    // cc.log(name, oldVal, this.state)
                     this.emit("state", this.state, oldVal)
                     this.emit(this._stateEnum[this.state])
                     this._flushSubStaters()
-                }
-            },
-            curState:{
-                get(){
-                    return this._stateEnum[this.state]
                 }
             },
             _stateEnum: {

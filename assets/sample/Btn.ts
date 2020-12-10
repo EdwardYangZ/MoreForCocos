@@ -41,15 +41,24 @@ export default class Btn extends cc.Component {
             if (this.btnState.state != BtnState.down) {
                 return false
             }
-            this.node.emit(Btn.EventType.click)
-            this.btnState.state = BtnState.nor
+            this._onClick()
         }, this)
         this.node.on(cc.Node.EventType.TOUCH_CANCEL, ()=>{
-            if (this.btnState.state == BtnState.disable) {
-                return false
-            }
-            this.btnState.state = BtnState.down
+            this.touchCancel()
         }, this)
+    }
+
+    touchCancel(){
+        if (this.btnState.state == BtnState.disable) {
+            return false
+        }
+        this.btnState.state = BtnState.nor
+    }
+
+    private _onClick(){
+        cc.log("click", this.node.name)
+        this.node.emit(Btn.EventType.click)
+        this.btnState.state = BtnState.nor
     }
 }
 
