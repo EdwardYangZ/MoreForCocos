@@ -9,7 +9,10 @@ export declare class State<T> extends cc.EventTarget{
     public subStaters:Stater[]
 }
 
-export function newState(name, enumType) {
+export function newState(name, enumType):new ()=>any {
+    if (cc.js.getClassByName(name)) {
+        return <new ()=>any>cc.js.getClassByName(name)
+    }
     let classDef = {
         name:name,
         extends: cc.EventTarget,
@@ -106,5 +109,5 @@ export function newState(name, enumType) {
             return sv == this.state
         },
     }
-    return cc.Class(classDef)
+    return <new ()=>any>cc.Class(classDef)
 }
